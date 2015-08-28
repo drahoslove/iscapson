@@ -19,7 +19,7 @@ void PressCapsLock(){
 	ip.ki.wVk = VK_CAPITAL;
 	ip.ki.wScan = 0;
 	ip.ki.time = 0;
-    ip.ki.dwExtraInfo = 0;
+	ip.ki.dwExtraInfo = 0;
 
 	ip.ki.dwFlags = 0; //kedown
 	SendInput(1, &ip, sizeof(INPUT));

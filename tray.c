@@ -4,6 +4,8 @@
 #include <string.h>
 #include <tchar.h>
 
+#include "tray.h"
+
 #define WM_MYMESSAGE (WM_USER + 1)
 #define TRAYHOST_ICON_ID 100
 #define MAX_LOADSTRING 255
@@ -18,16 +20,14 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 HWND                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
-extern void tray_callback(int itemId);
-
-void reset_menu() {
+void reset_tray_menu() {
     if (hSubMenu != NULL) {
         DestroyMenu(hSubMenu);
     }
     hSubMenu = CreatePopupMenu();
 }
 
-void set_menu_item(int id, const char* go_title, int disabled) {
+void set_tray_menu_item(int id, const char* go_title, int disabled) {
     LPTSTR title = (LPTSTR)calloc(MAX_LOADSTRING, sizeof(TCHAR));
     lstrcpy(title, (LPTSTR)go_title);
 
@@ -64,7 +64,7 @@ void set_menu_item(int id, const char* go_title, int disabled) {
     }
 }
 
-void set_icon(int iconId) {
+void set_tray_icon(int iconId) {
 
     HINSTANCE hInstance = GetModuleHandle(NULL);
 
@@ -88,7 +88,7 @@ void native_loop() {
     }
 }
 
-void init(const char *go_title) {
+void init_tray(const char *go_title) {
     HINSTANCE hInstance = GetModuleHandle(NULL);
 
     szTitle = (LPTSTR)calloc(MAX_LOADSTRING, sizeof(TCHAR));
@@ -113,7 +113,7 @@ void init(const char *go_title) {
     nid.uFlags = NIF_TIP | NIF_MESSAGE;
 
     Shell_NotifyIcon(NIM_ADD, &nid);
-    reset_menu();
+    reset_tray_menu();
 }
 
 void exit_loop() {

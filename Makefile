@@ -9,7 +9,7 @@ run: build
 
 build: $(NAME)
 
-$(NAME): $(NAME).o icons.o caps.o tray.o
+$(NAME): $(NAME).o icons.o buffer.o caps.o tray.o lang.o
 	gcc $(FLAGS) $^ -o $@
 
 %.o: %.c %.h

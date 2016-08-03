@@ -1,7 +1,5 @@
 #include "caps.h"
 
-extern void CapsLockChanged();
-
 static LRESULT keyHookProc(int nCode, WPARAM wParam, LPARAM lParam){
 	if (nCode >= 0) {
 		KBDLLHOOKSTRUCT kbdStruct = *((KBDLLHOOKSTRUCT*)lParam);
@@ -34,8 +32,9 @@ void SetCapsLockHook(bool startLoop){
 		exit(1);
 	}
 	MSG msg;
-	while (startLoop && !GetMessage(&msg, NULL, 0, 0)) { 
-		//
+	while (startLoop && GetMessage(&msg, NULL, 0, 0)) { 
+		TranslateMessage(&msg);
+        DispatchMessage(&msg);
 	}
 }
 

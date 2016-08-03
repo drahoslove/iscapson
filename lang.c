@@ -2,10 +2,14 @@
 #include "buffer.h"
 
 const int BUFF_SIZE = 25;
+const int WAIT_TIME = 1000*10; // 10s
 
 bool autoChangeEnabled;
 Buffer buffer;
 long int lastTime;
+long int lastCapsTime;
+
+
 
 /**
  * return number determining (guessing) if user intended to write numeric or diacritics
@@ -41,21 +45,25 @@ float getProbabilityOfDiacritics(Buffer* buffer){
 
 static LRESULT keyHookProc(int code, WPARAM wParam, LPARAM lParam){
 	KBDLLHOOKSTRUCT kbdStruct = *((KBDLLHOOKSTRUCT*)lParam);
-	if (code >= 0) {
-		if (wParam == WM_KEYDOWN && kbdStruct.vkCode != VK_CAPITAL) {
-			if(
+	if (code >= 0 && wParam == WM_KEYDOWN) {
+		if (kbdStruct.vkCode != VK_CAPITAL) {
+			if (
 				1 || // save all
 				kbdStruct.vkCode >= '0' && kbdStruct.vkCode <= '9' ||
 				kbdStruct.vkCode >= 'A' && kbdStruct.vkCode <= 'Z' ||
 				kbdStruct.vkCode == ' '
-			){
-				if (kbdStruct.time - lastTime > 320) { // too long iddle, forgot eveything
+			) {
+				if (kbdStruct.time - lastTime > 250) { // too long iddle, forgot eveything
 					emptyBuffer(&buffer);
 				}
 
 				pushBuffer(&buffer, kbdStruct.vkCode);
 
-				if (autoChangeEnabled && kbdStruct.vkCode >= '0' && kbdStruct.vkCode <= '9') {
+				if (
+					autoChangeEnabled &&
+					(kbdStruct.time - lastCapsTime) > WAIT_TIME &&
+					kbdStruct.vkCode >= '0' && kbdStruct.vkCode <= '9'
+				) {
 					float diacritics = getProbabilityOfDiacritics(&buffer);
 					if (diacritics >= 0.75) {
 						LangChange(CS);
@@ -65,15 +73,18 @@ static LRESULT keyHookProc(int code, WPARAM wParam, LPARAM lParam){
 					}
 				}
 
-				lastTime = kbdStruct.time; 
+				lastTime = kbdStruct.time;
 			}
+		}
+		if (kbdStruct.vkCode == VK_CAPITAL && !(kbdStruct.flags & LLKHF_INJECTED)) {
+			lastCapsTime = kbdStruct.time;
 		}
 	}
 	return CallNextHookEx(NULL, code, wParam, lParam);
 }
 
 
-void SetLangHook(bool startLoop){
+void SetLangHook(bool startLoop) {
 	initBuffer(&buffer, BUFF_SIZE);
 	lastTime = 0;
 	autoChangeEnabled = true;
@@ -88,10 +99,10 @@ void SetLangHook(bool startLoop){
 }
 
 
-void ToggleAutoLang(){
+void ToggleAutoLang() {
 	autoChangeEnabled = !autoChangeEnabled;
 }
 
-bool IsAutoLangEnabled(){
+bool IsAutoLangEnabled() {
 	return autoChangeEnabled;
 }

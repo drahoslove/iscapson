@@ -40,7 +40,7 @@ void CapsLockChanged(){
 }
 
 // required by lang module
-void LangChange(Lang lang){
+void LangChange(Lang lang) {
 	switch (lang) {
 		case EN:
 			IsCapsLockOn() && (PressCapsLock(), 1);
@@ -68,12 +68,10 @@ void tray_callback(int itemId) {
 				set_tray_menu_item(LANG, (char*) L"enable autoswitch", false);
 			}
 			break;
-
 	}	
 }
 
 int main(int argc, char const *argv[]) {
-
 
 	// init tray
 	init_tray((char*) L"IsCapsOn?+");
